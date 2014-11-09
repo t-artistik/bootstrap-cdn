@@ -73,6 +73,16 @@ if (args.c) {
 }
 
 maxconf.file = targets;
-console.dir(maxconf);
 
-//maxpurge(maxconf);
+maxpurge(maxconf, function(err, res) {
+    if (err) console.trace(err);
+    res.forEach(function (r) {
+        if (r.response.code !== 200) {
+            console.log('Purge on %s (id: %s) failed with status code %s.',
+                                        r.type, r.zone, r.response.code);
+        } else {
+            console.log('Purge on %s (id: %s) successful.', r.type, r.zone);
+        }
+    });
+});
+
