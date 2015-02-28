@@ -43,6 +43,15 @@ $ node
 '/tmp'
 ```
 
+### Dockerized
+
+```
+$ docker build bootstrapcdn .
+$ sudo docker run -p 3333:80 -d --name=bootstrapcdn \
+    -v /path/to/_maxcdn.yml:/usr/src/app/config/_maxcdn.yml \
+    -p 3333:80 bootstrapcdn:latest
+```
+
 ### Demonized
 
 ```
