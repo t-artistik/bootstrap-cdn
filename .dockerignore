@@ -1,2 +1,4 @@
 node_modules
 logs
+_nginx
+docker-compose.yml

@@ -1,65 +1,26 @@
-# Simple Makefile wrappers to support 'make <task>' over 'node make <task>'.
-# This is a simple solution to avoid rewriting deployment automation.
-###
+docker_compose?=1.1.0
 
-all:
-	node make all
+up: build rm
+	./scripts/docker-compose up --no-build
 
-test:
-	node make test
-
-test-nc:
-	node make test-nc
-
-travis: test bootlint validator
-
-clean:
-	node make clean
-
-run:
-	node make run
+build: scripts/docker-compose
+	./scripts/docker-compose build
 
 start:
-	node make start
+	./scripts/docker-compose up --no-build --no-recreate
 
 stop:
-	node make stop
+	./scripts/docker-compose stop
 
-restart:
-	node make restart
+logs:
+	./scripts/docker-compose logs
 
-status:
-	node make status
+rm:
+	./scripts/docker-compose rm --force
 
-help:
-	node make help
+clean: rm
 
-bootlint:
-	node make bootlint
-
-validator:
-	node make validator
-
-wp-plugin: setup
-	node make wp-plugin
-
-###
-# Tasks which remain in Makefile only.
-###
-
-setup:
-	npm run setup
-
-nginx/start:
-	sudo /usr/local/nginx/sbin/nginx -c /home/$(USER)/bootstrap-cdn/nginx.conf
-
-nginx/stop:
-	sudo pkill -9 nginx
-
-nginx/restart: nginx/stop nginx/start
-
-nginx/reload: nginx.conf
-	sudo pkill -HUP nginx
-
-nginx.conf:
-	sed -e "s/CURRENT_USER/$(USER)/g" .nginx.conf > nginx.conf
+scripts/docker-compose:
+	curl -L https://github.com/docker/compose/releases/download/$(docker_compose)/docker-compose-`uname -s`-`uname -m` \
+		> scripts/docker-compose
+	chmod 755 scripts/docker-compose

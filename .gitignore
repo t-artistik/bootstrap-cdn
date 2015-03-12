@@ -11,3 +11,5 @@ reports/
 lint.html
 config/_maxcdn.yml
 shelljs_*
+scripts/docker-compose
+*.old

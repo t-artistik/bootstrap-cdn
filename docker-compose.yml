@@ -1,0 +1,31 @@
+app0:
+  build: .
+  expose:
+    - "3000"
+  environment:
+    PORT: 3000
+    NODE_ENV: production
+app1:
+  image: bootstrapcdn_app0
+  expose:
+    - "3000"
+  environment:
+    PORT: 3000
+    NODE_ENV: production
+app2:
+  image: bootstrapcdn_app0
+  expose:
+    - "3000"
+  environment:
+    PORT: 3000
+    NODE_ENV: production
+nginx:
+  build: ./_nginx/
+  links:
+    - app0
+    - app1
+    - app2
+  ports:
+    - "8888:80"
+  environment:
+    NODE_PORT: 3000
