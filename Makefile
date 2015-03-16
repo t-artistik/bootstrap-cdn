@@ -1,26 +1,42 @@
-docker_compose?=1.1.0
+image?=maxcdn/bootstrapcdn
+tag?=latest
+name?=bootstrapcdn
+NODE_ENV?=production
+PORT?=3000
 
-up: build rm
-	./scripts/docker-compose up --no-build
-
-build: scripts/docker-compose
-	./scripts/docker-compose build
+build:
+	docker build -t $(image):$(tag)
+	cd _nginx; docker build -t $(image)-nginx:$(tag)
 
 start:
-	./scripts/docker-compose up --no-build --no-recreate
+	docker run -d -e PORT=$(PORT) -e NODE_ENV=$(NODE_ENV) \
+		--name=$(name)01 $(image)
+	docker run -d -e PORT=$(PORT) -e NODE_ENV=$(NODE_ENV) \
+		--name=$(name)02 $(image)
+	docker run -d -e PORT=$(PORT) -e NODE_ENV=$(NODE_ENV) \
+		--name=$(name)03 $(image)
 
 stop:
-	./scripts/docker-compose stop
-
-logs:
-	./scripts/docker-compose logs
+	docker stop --time=10 $(name)01 $(name)02 $(name)03 $(name)-nginx
 
 rm:
-	./scripts/docker-compose rm --force
+	docker rm -f $(name)01 $(name)02 $(name)03 $(name)-nginx
 
-clean: rm
 
-scripts/docker-compose:
-	curl -L https://github.com/docker/compose/releases/download/$(docker_compose)/docker-compose-`uname -s`-`uname -m` \
-		> scripts/docker-compose
-	chmod 755 scripts/docker-compose
+restart:
+	# Rolling restart.
+	# ###
+	# Remove 01
+	docker stop --time=10 $(name)01
+	docker rm -f $(name)01
+	# Start 01
+	docker run -d -e PORT=$(PORT) -e NODE_ENV=$(NODE_ENV) \
+		--name=$(name)01 $(image)
+	# Remove 02 and 03
+	docker stop --time=10 $(name)02 $(name)03 $(name)-nginx
+	docker rm -f $(name)02 $(name)03 $(name)-nginx
+	# Start 02 and 03
+	docker run -d -e PORT=$(PORT) -e NODE_ENV=$(NODE_ENV) \
+		--name=$(name)02 $(image)
+	docker run -d -e PORT=$(PORT) -e NODE_ENV=$(NODE_ENV) \
+		--name=$(name)03 $(image)
