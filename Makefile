@@ -4,5 +4,8 @@
 run:
 	node make $@
 
+functional
+	node ./node_modules/.bin/mocha ./tests/functional_test.js
+
 %:
 	node make $@
